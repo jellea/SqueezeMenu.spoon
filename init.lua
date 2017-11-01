@@ -8,6 +8,13 @@ local getSetting = function(label, default)
   default 
 end
 
+local leftPad = function(str, len, char)
+  local str = tostring(str)
+  -- the classic, stolen (and adapted) from here: http://snipplr.com/view/13092/strlpad--pad-string-to-the-left/
+  if char == nil then char = ' ' end
+  return string.rep(char, len - #str) .. str
+end
+
 local serverURL = getSetting("squeezeconfig").serverURL
 local playerId = getSetting("squeezeconfig").playerId
 
@@ -24,13 +31,12 @@ function module:setData(data)
     module.data = {current=curr,
     		   raw=data,
     }
-    log(module.data)
   end
   self:draw()
 end
 
 function module:parseJson(s,r,h)
-  --if s == 200 then
+  --if s == 200 then -- I don't get why this all a sudden doesnt give a statusCode!?
     module:setData(hs.json.decode(s).result)
   --else
   --  module:setData({error="Error from server"})
@@ -65,8 +71,10 @@ function module:draw()
     table.insert(menuitems, {title=string.sub(current.title,0, 26), disabled=true})
     table.insert(menuitems, {title=string.sub(current.artist,0, 26), disabled=true})
     table.insert(menuitems, {title=string.sub(current.album,0, 26), disabled=true})
-    table.insert(menuitems, {title=math.floor(raw.time/60)..":"..math.fmod(math.floor(raw.time),60).."/"..
-                                   math.floor(current.duration/60)..":"..math.fmod(math.floor(current.duration),60), disabled=true})
+    table.insert(menuitems, {title=math.floor(raw.time/60)..":"..
+                                   leftPad(math.fmod(math.floor(raw.time),60),2,"0").."/"..
+                                   math.floor(current.duration/60)..":"..
+				   leftPad(math.fmod(math.floor(current.duration),60),2,"0"), disabled=true})
     --table.insert(menuitems, {image=, disabled=true})
     table.insert(menuitems, {title="-"})
 

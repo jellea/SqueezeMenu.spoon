@@ -67,6 +67,10 @@ function module:draw()
     local current = module.data.current
     local raw = module.data.raw
     
+    if current["artwork_track_id"] then
+      local img = hs.image.imageFromURL(serverURL.."music/"..current.artwork_track_id.."/cover_96x96_p.png")
+      table.insert(menuitems, {image=img, title=""})
+    end
     table.insert(menuitems, {title=modelang[raw.mode], disabled=true})
     table.insert(menuitems, {title=string.sub(current.title,0, 26), disabled=true})
     table.insert(menuitems, {title=string.sub(current.artist,0, 26), disabled=true})
@@ -75,7 +79,7 @@ function module:draw()
                                    leftPad(math.fmod(math.floor(raw.time),60),2,"0").."/"..
                                    math.floor(current.duration/60)..":"..
 				   leftPad(math.fmod(math.floor(current.duration),60),2,"0"), disabled=true})
-    --table.insert(menuitems, {image=, disabled=true})
+
     table.insert(menuitems, {title="-"})
 
     if module.data.raw.mode == "play" then
@@ -83,8 +87,8 @@ function module:draw()
     else
       table.insert(menuitems, {title="Play", fn=function() module:request('["play","0"]') end})
     end
-    table.insert(menuitems, {title="Next"})
-    table.insert(menuitems, {title="Previous"})
+    table.insert(menuitems, {title="Next", fn=function() module:request('["playlist","index","+1"]') end})
+    table.insert(menuitems, {title="Previous", fn=function() module:request('["playlist","index","-1"]') end})
   else
     table.insert(menuitems, {title="Not connected", disabled = true})
   end
